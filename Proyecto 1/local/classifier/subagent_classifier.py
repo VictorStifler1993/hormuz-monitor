@@ -56,6 +56,16 @@ def classify_article(article: RawArticle) -> ClassifiedArticle | None:
             import shutil
             claude_cmd = shutil.which("claude") or "claude"
 
+        # Asegurar que Node.js está en el PATH (necesario en algunos entornos Windows)
+        env = os.environ.copy()
+        node_paths = [
+            os.path.join(os.environ.get("ProgramFiles", ""), "nodejs"),
+            os.path.join(os.environ.get("APPDATA", ""), "npm"),
+        ]
+        for p in node_paths:
+            if os.path.isdir(p) and p not in env.get("PATH", ""):
+                env["PATH"] = p + os.pathsep + env.get("PATH", "")
+
         # Pasar prompt via pipe stdin — seguro, sin límite de longitud de argumentos
         result = subprocess.run(
             [claude_cmd, "--output-format", "json"],
@@ -66,6 +76,7 @@ def classify_article(article: RawArticle) -> ClassifiedArticle | None:
             encoding="utf-8",
             errors="replace",
             shell=(os.name == "nt"),
+            env=env,
         )
 
         if result.returncode != 0:

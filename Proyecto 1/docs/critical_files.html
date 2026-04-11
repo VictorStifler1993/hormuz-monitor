@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivos Críticos del Sistema — Proyecto Antigravity</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: #1a1a2e;
+            background: #f0f0f5;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 3rem;
+        }
+        h1 {
+            font-size: 2.2rem;
+            color: #16213e;
+            border-bottom: 3px solid #e94560;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        h2 {
+            font-size: 1.5rem;
+            color: #0f3460;
+            margin-top: 2.5rem;
+            margin-bottom: 0.8rem;
+        }
+        p { margin-bottom: 1rem; }
+        .intro {
+            background: #e8eaf6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 1.05rem;
+        }
+        .file-card {
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+            transition: border-color 0.3s;
+        }
+        .file-card:hover {
+            border-color: #0f3460;
+        }
+        .file-card.critical-high {
+            border-left: 6px solid #dc3545;
+        }
+        .file-card.critical-medium {
+            border-left: 6px solid #ffc107;
+        }
+        .file-path {
+            font-family: 'Courier New', monospace;
+            background: #1a1a2e;
+            color: #00ff88;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .badge-cloud { background: #cce5ff; color: #004085; }
+        .badge-local { background: #d4edda; color: #155724; }
+        .badge-shared { background: #fff3cd; color: #856404; }
+        .badge-infra { background: #f8d7da; color: #721c24; }
+        .what, .why-critical, .breaks-if {
+            margin: 0.8rem 0;
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+        }
+        .what { background: #e3f2fd; }
+        .why-critical { background: #fff8e1; }
+        .breaks-if { background: #fce4ec; }
+        .label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .what .label { color: #1565c0; }
+        .why-critical .label { color: #f57f17; }
+        .breaks-if .label { color: #c62828; }
+        .dependency-graph {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            padding: 2rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+        .dependency-graph .highlight-node { color: #00ff88; font-weight: bold; }
+        .dependency-graph .arrow { color: #e94560; }
+        .analogy {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Archivos Críticos del Sistema</h1>
+        <p><em>Qué son, qué función cumplen, y por qué son críticos</em></p>
+
+        <div class="intro">
+            <strong>¿Qué es un archivo crítico?</strong> Es un archivo que, si se elimina, se corrompe
+            o tiene un bug, <strong>rompe múltiples partes del sistema en cascada</strong>. No todos los
+            archivos son igual de importantes: un scraper puede fallar y los demás siguen funcionando.
+            Pero si falla un archivo crítico, todo se para. Son los "puntos de fallo único" del sistema.
+        </div>
+
+        <div class="analogy">
+            Piensa en una fábrica: si se rompe una máquina de empaquetado, puedes empaquetar a mano.
+            Pero si se va la luz (el generador central), toda la fábrica se detiene. Los archivos
+            críticos son el generador de esta fábrica.
+        </div>
+
+        <h2>Mapa de dependencias</h2>
+        <div class="dependency-graph">
+<span class="highlight-node">shared/models.py</span> <span class="arrow">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+    <span class="arrow">┃</span>                                                           <span class="arrow">┃</span>
+    <span class="arrow">▼</span>                                                           <span class="arrow">▼</span>
+<span class="highlight-node">cloud/main.py</span>                                        <span class="highlight-node">local/main.py</span>
+    <span class="arrow">┃</span>                                                           <span class="arrow">┃</span>
+    <span class="arrow">├──▶</span> cloud/scraper/*.py                                    <span class="arrow">├──▶</span> <span class="highlight-node">local/classifier/subagent_classifier.py</span>
+    <span class="arrow">├──▶</span> cloud/dedup/deduplicator.py                           <span class="arrow">├──▶</span> local/ingest/oil_prices.py
+    <span class="arrow">├──▶</span> cloud/storage/cloud_storage.py                        <span class="arrow">├──▶</span> local/analysis/correlator.py
+    <span class="arrow">└──▶</span> cloud/notifier/keyword_alerter.py                     <span class="arrow">├──▶</span> <span class="highlight-node">local/analysis/pattern_discovery.py</span>
+                                                                    <span class="arrow">├──▶</span> <span class="highlight-node">local/analysis/scale_calibrator.py</span>
+<span class="highlight-node">.github/workflows/hormuz_monitor.yml</span>                       <span class="arrow">└──▶</span> local/reports/report_generator.py
+    <span class="arrow">┃</span>
+    <span class="arrow">└──▶</span> Ejecuta cloud/main.py cada 15 min (autonomía 24/7)
+        </div>
+
+        <!-- ARCHIVO 1 -->
+        <div class="file-card critical-high">
+            <span class="file-path">shared/models.py</span>
+            <span class="badge badge-shared">COMPARTIDO</span>
+            <div class="what">
+                <span class="label">Qué hace</span>
+                Define las estructuras de datos fundamentales del sistema: <code>RawArticle</code>,
+                <code>ClassifiedArticle</code>, <code>OilPrice</code>, <code>CorrelationResult</code>.
+                Son las "plantillas" que describen cómo se ve un artículo, un precio, una clasificación.
+                Todos los módulos del sistema hablan este mismo idioma.
+            </div>
+            <div class="why-critical">
+                <span class="label">Por qué es crítico</span>
+                Es la <strong>lengua común</strong> de todo el sistema. Cada módulo — scrapers, clasificador,
+                base de datos, analizadores, notificadores — importa estos modelos. Si cambias un campo aquí,
+                afecta a 15+ archivos simultáneamente. Es el archivo con más "dependientes" de todo el proyecto.
+            </div>
+            <div class="breaks-if">
+                <span class="label">Qué se rompe si falla</span>
+                TODO. Los scrapers no pueden crear artículos. La base de datos no puede guardarlos.
+                El clasificador no puede devolver resultados. Los analizadores no pueden procesar datos.
+                Los informes no se generan. El sistema entero queda inoperativo.
+            </div>
+        </div>
+
+        <!-- ARCHIVO 2 -->
+        <div class="file-card critical-high">
+            <span class="file-path">cloud/main.py</span>
+            <span class="badge badge-cloud">CLOUD</span>
+            <div class="what">
+                <span class="label">Qué hace</span>
+                Es el director de orquesta del componente cloud. Cada 15 minutos: activa los scrapers,
+                filtra duplicados, guarda los artículos nuevos en JSONL, y comprueba si hay alertas por
+                keywords. Es el archivo que GitHub Actions ejecuta directamente.
+            </div>
+            <div class="why-critical">
+                <span class="label">Por qué es crítico</span>
+                Sin este archivo, <strong>el sistema deja de recopilar datos automáticamente</strong>.
+                Es el punto de entrada que conecta el cron de GitHub Actions con toda la lógica de
+                scraping. Si falla, no llegan datos nuevos, y sin datos nuevos, todo el análisis local
+                se queda estancado con información vieja.
+            </div>
+            <div class="breaks-if">
+                <span class="label">Qué se rompe si falla</span>
+                La recopilación automática de noticias se detiene. No se generan archivos JSONL nuevos.
+                Las alertas por keywords dejan de funcionar. El componente local no tiene datos frescos
+                que analizar. Es como cortar el suministro de agua a la planta de tratamiento.
+            </div>
+        </div>
+
+        <!-- ARCHIVO 3 -->
+        <div class="file-card critical-high">
+            <span class="file-path">local/classifier/subagent_classifier.py</span>
+            <span class="badge badge-local">LOCAL</span>
+            <div class="what">
+                <span class="label">Qué hace</span>
+                Toma artículos en bruto y los envía a un subagente de Claude Code para clasificarlos:
+                ¿es escalada o desescalada? ¿Cuán relevante es? ¿Qué actores están involucrados?
+                ¿Cómo podría afectar al precio? Transforma texto plano en datos estructurados y
+                cuantificados.
+            </div>
+            <div class="why-critical">
+                <span class="label">Por qué es crítico</span>
+                Es el <strong>cerebro</strong> del sistema. Sin clasificación, los artículos son solo
+                texto sin procesar. No puedes correlacionar "texto" con precios del petróleo. Necesitas
+                los números (escalation_score, relevance_score) para que toda la cadena de análisis
+                funcione. Es lo que convierte noticias en señales cuantificables.
+            </div>
+            <div class="breaks-if">
+                <span class="label">Qué se rompe si falla</span>
+                Todos los módulos de análisis quedan sin datos. No hay correlaciones. No hay backtesting.
+                No hay descubrimiento de patrones. No hay notificaciones por email (porque las notificaciones
+                dependen del score de relevancia y escalación). El sistema recopila noticias pero no las
+                entiende.
+            </div>
+        </div>
+
+        <!-- ARCHIVO 4 -->
+        <div class="file-card critical-high">
+            <span class="file-path">.github/workflows/hormuz_monitor.yml</span>
+            <span class="badge badge-infra">INFRAESTRUCTURA</span>
+            <div class="what">
+                <span class="label">Qué hace</span>
+                Es la configuración de GitHub Actions que programa la ejecución automática cada 15 minutos.
+                Define: qué versión de Python usar, qué dependencias instalar, qué secretos inyectar
+                (API keys, credenciales de email), y cómo commitear los datos nuevos de vuelta al repositorio.
+            </div>
+            <div class="why-critical">
+                <span class="label">Por qué es crítico</span>
+                Es lo que hace el sistema <strong>autónomo</strong>. Sin este archivo, tendrías que ejecutar
+                el scraper manualmente cada 15 minutos, 96 veces al día, 24/7. Este archivo es la diferencia
+                entre un script que corres a mano y un sistema que trabaja solo mientras duermes.
+            </div>
+            <div class="breaks-if">
+                <span class="label">Qué se rompe si falla</span>
+                El monitoreo automático se detiene completamente. No se recogen noticias mientras no estés
+                delante del ordenador. Puedes perder eventos críticos que ocurran de madrugada o en fin de
+                semana. El sistema pasa de ser un monitor 24/7 a ser un script manual.
+            </div>
+        </div>
+
+        <!-- ARCHIVO 5 -->
+        <div class="file-card critical-medium">
+            <span class="file-path">local/analysis/pattern_discovery.py</span>
+            <span class="badge badge-local">LOCAL</span>
+            <div class="what">
+                <span class="label">Qué hace</span>
+                Es el motor de "lo que no sabemos que no sabemos". Busca: movimientos de precio sin
+                noticias que los expliquen, términos nuevos emergentes, cambios de régimen en la relación
+                noticias-precio, causalidad de Granger, y efectos de interacción entre categorías.
+            </div>
+            <div class="why-critical">
+                <span class="label">Por qué es crítico</span>
+                Es lo que <strong>diferencia este sistema de un simple agregador de noticias</strong>.
+                Cualquiera puede hacer un scraper de noticias. Lo que hace valioso a este proyecto es
+                su capacidad de descubrir patrones ocultos y relaciones no obvias. Sin este módulo,
+                el sistema solo recopila y clasifica — no descubre.
+            </div>
+            <div class="breaks-if">
+                <span class="label">Qué se rompe si falla</span>
+                Se pierde la capacidad de descubrir anomalías, cambios de régimen y causalidad.
+                El sistema sigue funcionando (scraping, clasificación, correlación básica), pero pierde
+                su ventaja competitiva: la exploración. Es como tener un microscopio y solo usarlo
+                como lupa.
+            </div>
+        </div>
+
+        <!-- ARCHIVO 6 -->
+        <div class="file-card critical-medium">
+            <span class="file-path">local/analysis/scale_calibrator.py</span>
+            <span class="badge badge-local">LOCAL</span>
+            <div class="what">
+                <span class="label">Qué hace</span>
+                Analiza qué scores de escalación realmente precedieron movimientos de precio y ajusta
+                los umbrales automáticamente. Con el tiempo, la escala se adapta a la realidad en lugar
+                de usar categorías fijas predefinidas.
+            </div>
+            <div class="why-critical">
+                <span class="label">Por qué es crítico</span>
+                Es lo que hace al sistema <strong>adaptativo</strong>. Los mercados cambian. Lo que
+                movía el precio del petróleo hace 6 meses puede no moverlo hoy. Sin calibración, el
+                sistema usa umbrales que pueden volverse obsoletos, generando falsos positivos
+                (alertas innecesarias) o falsos negativos (eventos ignorados que sí importaban).
+            </div>
+            <div class="breaks-if">
+                <span class="label">Qué se rompe si falla</span>
+                El sistema sigue funcionando pero con una escala potencialmente desactualizada.
+                Las notificaciones pueden llegar por eventos irrelevantes o no llegar por eventos
+                importantes. La calidad del análisis se degrada gradualmente con el tiempo.
+            </div>
+        </div>
+
+        <h2>Resumen: niveles de criticidad</h2>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <tr>
+                <th style="background: #dc3545; color: white; padding: 0.8rem;">Archivo</th>
+                <th style="background: #dc3545; color: white; padding: 0.8rem;">Si falla...</th>
+                <th style="background: #dc3545; color: white; padding: 0.8rem;">Impacto</th>
+            </tr>
+            <tr>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;"><code>shared/models.py</code></td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">Nada funciona</td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">100% del sistema</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;"><code>cloud/main.py</code></td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">No llegan datos nuevos</td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">100% del pipeline cloud</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;"><code>subagent_classifier.py</code></td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">No hay clasificación</td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">100% del análisis</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;"><code>hormuz_monitor.yml</code></td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">No hay automatización</td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">Autonomía 24/7</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;"><code>pattern_discovery.py</code></td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">No hay descubrimiento</td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">Valor diferencial</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;"><code>scale_calibrator.py</code></td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">Escala se desactualiza</td>
+                <td style="padding: 0.8rem; border-bottom: 1px solid #dee2e6;">Precisión a largo plazo</td>
+            </tr>
+        </table>
+
+        <div class="footer">
+            <p>Documento generado para el Proyecto Antigravity — Sistema de Monitoreo Geopolítico del Estrecho de Ormuz</p>
+        </div>
+    </div>
+</body>
+</html>

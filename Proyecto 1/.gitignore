@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+venv/
+.venv/
+env/
+
+# Entorno
+.env
+
+# Base de datos local (se genera localmente, no se sube al repo)
+data/hormuz.db
+data/hormuz.db-wal
+data/hormuz.db-shm
+
+# Exports locales
+data/exports/*
+!data/exports/.gitkeep
+
+# Processed locales
+data/processed/*
+!data/processed/.gitkeep
+
+# Calibración (contiene estado local del modelo)
+data/calibration/*
+!data/calibration/.gitkeep
+
+# Precios (se obtienen en local)
+data/raw/prices/*
+!data/raw/prices/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store

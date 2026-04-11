@@ -1,0 +1,46 @@
+name: Hormuz Monitor
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Cada 15 minutos
+  workflow_dispatch:         # Trigger manual para testing
+
+permissions:
+  contents: write            # Para commitear datos nuevos al repo
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r "Proyecto 1/requirements-cloud.txt"
+
+      - name: Run monitor
+        working-directory: "Proyecto 1"
+        env:
+          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+        run: python -m cloud.main
+
+      - name: Commit new data
+        working-directory: "Proyecto 1"
+        run: |
+          git config user.name "Hormuz Bot"
+          git config user.email "bot@hormuz-monitor.local"
+          git add data/raw/news/ data/state.json
+          git diff --cached --quiet || git commit -m "datos: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push

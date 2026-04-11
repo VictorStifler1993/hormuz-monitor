@@ -1,0 +1,4 @@
+- Idioma: Español
+- Si fallas en algo, no te rindas, vuelve a intentarlo.
+- Si no entiendes algo, pregunta.
+- Si ves que para conseguir el objetivo primordial del plan hay maneras diferentes Pero más eficientes de conseguirlo Dímelo

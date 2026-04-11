@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Causalidad de Granger — Proyecto Antigravity</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: #1a1a2e;
+            background: #f0f0f5;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 3rem;
+        }
+        h1 {
+            font-size: 2.2rem;
+            color: #16213e;
+            border-bottom: 3px solid #e94560;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        h2 {
+            font-size: 1.5rem;
+            color: #0f3460;
+            margin-top: 2rem;
+            margin-bottom: 0.8rem;
+        }
+        h3 {
+            font-size: 1.2rem;
+            color: #533483;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        p { margin-bottom: 1rem; }
+        .highlight {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .key-point {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .warning {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .formula {
+            background: #e8eaf6;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        th, td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background: #0f3460;
+            color: white;
+            font-weight: 600;
+        }
+        tr:hover { background: #f8f9fa; }
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin: 1.5rem 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #0f3460;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.35rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            background: #e94560;
+            border-radius: 50%;
+        }
+        .timeline-year {
+            font-weight: bold;
+            color: #e94560;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Causalidad de Granger</h1>
+        <p><em>Qué es, de dónde viene, por qué funciona, y por qué lo usamos en este proyecto</em></p>
+
+        <h2>1. ¿Qué es la Causalidad de Granger?</h2>
+        <p>
+            La causalidad de Granger es un test estadístico que responde a una pregunta muy concreta:
+            <strong>¿Conocer los valores pasados de la serie A mejora nuestra capacidad de predecir
+            la serie B, más allá de lo que los propios valores pasados de B ya nos permiten?</strong>
+        </p>
+        <p>
+            En nuestro caso: ¿conocer las noticias pasadas sobre el Estrecho de Ormuz nos ayuda
+            a predecir el precio del petróleo mejor de lo que ya lo haríamos solo mirando precios pasados?
+        </p>
+
+        <div class="highlight">
+            <strong>Importante:</strong> La causalidad de Granger NO demuestra causalidad "real" en el
+            sentido filosófico. Demuestra <em>precedencia temporal y poder predictivo</em>. Si A
+            Granger-causa B, significa que A ocurre antes que B y contiene información útil para predecir B.
+            Puede haber un factor C que cause ambas.
+        </div>
+
+        <h2>2. Historia</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <span class="timeline-year">1956 — Norbert Wiener</span>
+                <p>El matemático Norbert Wiener propone la idea original: si podemos predecir mejor
+                una señal usando información de otra señal además de la propia, entonces hay una
+                relación causal. Lo plantea en el contexto de la teoría de la información.</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">1969 — Clive Granger</span>
+                <p>El economista británico Clive W.J. Granger formaliza la idea de Wiener en un
+                marco econométrico riguroso, publicando "Investigating Causal Relations by
+                Econometric Models and Cross-spectral Methods". Establece el test tal como
+                lo conocemos hoy.</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">1980s — Adopción masiva</span>
+                <p>El test se convierte en herramienta estándar en econometría. Se usa para estudiar
+                relaciones entre variables macroeconómicas: ¿el dinero causa inflación? ¿Las tasas
+                de interés causan crecimiento?</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">2003 — Premio Nobel</span>
+                <p>Clive Granger recibe el Premio Nobel de Economía (compartido con Robert Engle)
+                por sus contribuciones al análisis de series temporales, incluyendo el test
+                de causalidad que lleva su nombre.</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">2010s-presente — Aplicaciones modernas</span>
+                <p>Se aplica masivamente en neurociencia (conexiones cerebrales), finanzas
+                (relaciones entre mercados), climatología (patrones climáticos), y análisis
+                de redes sociales (propagación de información).</p>
+            </div>
+        </div>
+
+        <h2>3. ¿Cómo funciona?</h2>
+        <p>El test compara dos modelos de regresión:</p>
+
+        <h3>Modelo Restringido (solo usa historia propia)</h3>
+        <div class="formula">
+            Precio(t) = a₁·Precio(t-1) + a₂·Precio(t-2) + ... + aₙ·Precio(t-n) + error₁
+        </div>
+        <p>"Predigo el precio de hoy usando solo los precios de los días anteriores"</p>
+
+        <h3>Modelo No Restringido (usa historia propia + noticias)</h3>
+        <div class="formula">
+            Precio(t) = a₁·Precio(t-1) + ... + aₙ·Precio(t-n) + b₁·Noticias(t-1) + ... + bₙ·Noticias(t-n) + error₂
+        </div>
+        <p>"Predigo el precio de hoy usando precios pasados Y noticias pasadas"</p>
+
+        <h3>La pregunta clave</h3>
+        <p>
+            Si el modelo no restringido (con noticias) predice <em>significativamente mejor</em>
+            que el restringido (sin noticias), entonces las noticias "Granger-causan" los precios.
+            Esto se mide con un <strong>test F</strong> que compara los errores de ambos modelos.
+        </p>
+
+        <div class="key-point">
+            <strong>En nuestro proyecto:</strong> Si el test da un p-value < 0.05, podemos decir
+            con 95% de confianza que las noticias sobre el Estrecho de Ormuz contienen información
+            útil para predecir movimientos del petróleo. Si p > 0.05, la relación no es
+            estadísticamente significativa (puede ser ruido).
+        </div>
+
+        <h2>4. Validez actual en la comunidad científica</h2>
+
+        <h3>Fortalezas reconocidas</h3>
+        <table>
+            <tr>
+                <th>Aspecto</th>
+                <th>Valoración</th>
+            </tr>
+            <tr>
+                <td>Fundamento teórico</td>
+                <td>Sólido. Basado en teoría de la información y econometría clásica</td>
+            </tr>
+            <tr>
+                <td>Aceptación académica</td>
+                <td>Alta. Sigue siendo una de las herramientas más citadas en econometría</td>
+            </tr>
+            <tr>
+                <td>Reproducibilidad</td>
+                <td>Excelente. Resultados deterministas dados los mismos datos y parámetros</td>
+            </tr>
+            <tr>
+                <td>Interpretabilidad</td>
+                <td>Alta. El resultado es claro: sí/no con un nivel de confianza</td>
+            </tr>
+            <tr>
+                <td>Implementación</td>
+                <td>Simple. Disponible en todas las librerías estadísticas principales</td>
+            </tr>
+        </table>
+
+        <h3>Limitaciones conocidas</h3>
+        <table>
+            <tr>
+                <th>Limitación</th>
+                <th>Impacto en nuestro proyecto</th>
+            </tr>
+            <tr>
+                <td>No es causalidad "real" (solo precedencia temporal)</td>
+                <td>Aceptable. No necesitamos probar causalidad filosófica, solo utilidad predictiva</td>
+            </tr>
+            <tr>
+                <td>Asume relaciones lineales</td>
+                <td>Moderado. Lo complementamos con Spearman (no lineal) y detección de régimen</td>
+            </tr>
+            <tr>
+                <td>Sensible al número de lags elegido</td>
+                <td>Mitigado. Probamos múltiples lags y reportamos todos los resultados</td>
+            </tr>
+            <tr>
+                <td>Requiere series estacionarias</td>
+                <td>Manejable. Usamos retornos (diferencias) en lugar de precios absolutos</td>
+            </tr>
+            <tr>
+                <td>No captura variables omitidas</td>
+                <td>Conocido. Complementamos con análisis de anomalías (movimientos sin explicar)</td>
+            </tr>
+        </table>
+
+        <div class="warning">
+            <strong>Limitación crítica:</strong> La causalidad de Granger puede dar falsos positivos
+            si hay una tercera variable que causa ambas series con diferentes retardos. Por ejemplo,
+            si un evento geopolítico causa simultáneamente noticias Y movimientos de precio, el test
+            puede encontrar "causalidad" cuando en realidad ambas son efectos de la misma causa.
+            Por eso nuestro sistema incluye análisis de anomalías y detección de régimen como
+            complementos.
+        </div>
+
+        <h2>5. ¿Por qué lo elegimos frente a otras alternativas?</h2>
+
+        <table>
+            <tr>
+                <th>Método</th>
+                <th>Ventaja</th>
+                <th>Desventaja vs Granger</th>
+                <th>Decisión</th>
+            </tr>
+            <tr>
+                <td><strong>Correlación de Pearson/Spearman</strong></td>
+                <td>Simple, rápida</td>
+                <td>No establece dirección temporal. No distingue si A causa B o B causa A</td>
+                <td>Lo usamos TAMBIÉN (como complemento), pero no sustituye a Granger</td>
+            </tr>
+            <tr>
+                <td><strong>Transfer Entropy</strong></td>
+                <td>No asume linealidad, captura relaciones no lineales</td>
+                <td>Requiere muchos más datos para ser fiable, computacionalmente costoso</td>
+                <td>No viable con nuestro volumen de datos (construimos desde cero)</td>
+            </tr>
+            <tr>
+                <td><strong>VAR (Vector Autoregression)</strong></td>
+                <td>Modela múltiples series simultáneamente</td>
+                <td>Más complejo, requiere más datos, más difícil de interpretar</td>
+                <td>Posible mejora futura cuando tengamos suficientes datos</td>
+            </tr>
+            <tr>
+                <td><strong>SVAR (Structural VAR)</strong></td>
+                <td>Permite imponer restricciones teóricas</td>
+                <td>Requiere supuestos fuertes sobre la estructura causal</td>
+                <td>Demasiado rígido para un sistema exploratorio</td>
+            </tr>
+            <tr>
+                <td><strong>Convergent Cross Mapping (CCM)</strong></td>
+                <td>Funciona con sistemas dinámicos no lineales</td>
+                <td>Muy sensible al ruido, interpretación menos clara</td>
+                <td>Interesante pero experimental para nuestro caso de uso</td>
+            </tr>
+            <tr>
+                <td><strong>Redes Bayesianas</strong></td>
+                <td>Captura relaciones causales complejas</td>
+                <td>Requiere definir estructura a priori o muchos datos para aprenderla</td>
+                <td>Posible para Fase 4+ cuando el sistema madure</td>
+            </tr>
+        </table>
+
+        <div class="key-point">
+            <strong>Resumen de la decisión:</strong> Granger es el punto de partida ideal porque:
+            <ol style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                <li>Es el estándar en econometría financiera (credibilidad)</li>
+                <li>Funciona con datos relativamente escasos (empezamos de cero)</li>
+                <li>Es fácil de interpretar (sí/no + nivel de confianza)</li>
+                <li>Tiene implementación madura en Python (statsmodels)</li>
+                <li>Sus limitaciones son conocidas y las compensamos con otros análisis</li>
+            </ol>
+            No es el método más sofisticado, pero es el más apropiado para la fase actual del proyecto.
+            A medida que acumulemos datos, podremos incorporar métodos más avanzados.
+        </div>
+
+        <h2>6. Cómo lo implementamos</h2>
+        <p>
+            En nuestro sistema, el test de Granger se ejecuta en
+            <code>local/analysis/pattern_discovery.py → granger_causality_test()</code>.
+        </p>
+        <p>Proceso:</p>
+        <ol style="padding-left: 1.5rem; margin-bottom: 1rem;">
+            <li>Convertimos los scores de escalación de noticias en una serie temporal diaria</li>
+            <li>Convertimos los precios del petróleo en retornos diarios (para estacionaridad)</li>
+            <li>Alineamos ambas series por fecha</li>
+            <li>Ejecutamos el test con múltiples lags (1 a 10 días)</li>
+            <li>Reportamos el lag más significativo y si hay causalidad</li>
+        </ol>
+
+        <p>
+            El resultado se incluye automáticamente en los informes generados por
+            <code>local/reports/report_generator.py</code> y aparece como uno de los
+            "highlights" si la causalidad es significativa.
+        </p>
+
+        <div class="footer">
+            <p>Documento generado para el Proyecto Antigravity — Sistema de Monitoreo Geopolítico del Estrecho de Ormuz</p>
+            <p>Basado en: Granger, C.W.J. (1969). "Investigating Causal Relations by Econometric Models and Cross-spectral Methods". <em>Econometrica</em>, 37(3), 424-438.</p>
+        </div>
+    </div>
+</body>
+</html>
